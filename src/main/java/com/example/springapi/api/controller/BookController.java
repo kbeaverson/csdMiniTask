@@ -1,11 +1,11 @@
 package com.example.springapi.api.controller;
 
 import com.example.springapi.api.model.Book;
+import com.example.springapi.api.model.BookWithId;
 import com.example.springapi.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +13,7 @@ import java.util.Optional;
 @RestController
 public class BookController {
 
-    private BookService bookService;
+    private final BookService bookService;
 
     @Autowired
     public BookController(BookService bookService) {
@@ -21,18 +21,42 @@ public class BookController {
     }
 
     @GetMapping("/book")
-    public Book getUser(@RequestParam Integer id){
-        Optional book = bookService.getBook(id);
-        if(book.isPresent()) {
-            return (Book) book.get();
-        }
-        //This is back code ^V, but following tutorial
-        return null;
+    public BookWithId getBook(@RequestParam Integer id) {
+        Optional<BookWithId> book = bookService.getBook(id);
+        return (BookWithId) book.orElse(null);
+        //This is bad code ^V, but following tutorial
     }
 
     @GetMapping("/books")
-    public List<Book> getBooks() {
+    public List<BookWithId> getBooks() {
         return bookService.getBooks();
     }
 
+    @PostMapping("/books")
+    public ResponseEntity<BookWithId> addBook(@RequestBody Book newBook) {
+        BookWithId added = bookService.addBook(newBook);
+        return ResponseEntity.ok(added);
+    }
+
+    @PutMapping("/books/{id}")
+    public ResponseEntity<Book> updateBook(@PathVariable String id, @RequestBody Book book) {
+        System.out.println("Input method");
+        int idAsInt = Integer.parseInt(id);
+        Optional<BookWithId> updatedBook = bookService.updateBook(idAsInt, book);
+        System.out.println(updatedBook);
+        if (updatedBook.isPresent()) {
+            return ResponseEntity.ok(book);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/books/{id}")
+    public ResponseEntity<BookWithId> deleteBook(@PathVariable String id) {
+        int idAsInt = Integer.parseInt(id);
+        Optional<BookWithId> deletedBook = bookService.deleteBook(idAsInt);
+        if (deletedBook.isPresent()) {
+            return ResponseEntity.of(deletedBook);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }

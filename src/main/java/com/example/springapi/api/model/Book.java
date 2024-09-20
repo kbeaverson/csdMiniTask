@@ -1,27 +1,16 @@
 package com.example.springapi.api.model;
 
 public class Book {
-
-    private int id;
     private String author;
     private String title;
     private String synopsis;
     private String releaseDate;
 
-    public Book(int id, String author, String title, String synopsis, String releaseDate) {
-        this.id = id;
+    public Book(String title, String author, String synopsis, String releaseDate) {
         this.author = author;
         this.title = title;
         this.synopsis = synopsis;
         this.releaseDate = releaseDate;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getAuthor() {
